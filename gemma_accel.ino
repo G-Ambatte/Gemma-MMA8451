@@ -11,8 +11,8 @@ int ledPin = 1;
 Adafruit_MMA8451 mma = Adafruit_MMA8451();
 //Adafruit_NeoPixel pixels = Adafruit_NeoPixel(pixelCount, ledPin, NEO_GRB + NEO_KHZ800);
 
-const int seqLength = 3;
-int seq[seqLength] = {1, 2, 3};
+const int seqLength = 5;
+int seq[seqLength] = {1, 2, 3, 2, 3};
 
 int currentState = 0;
 const int accelLength = 10;
@@ -88,9 +88,16 @@ void loop() {
       accelState[0] = currentState;
 
       // Compare the latest part of the accelStates array to the seq array
-      if ( array_compare(accelState, seq, seqLength) ) {
+      if ( checkSequence(seq, 3) ) {
         // If they match, show success indication
-        magicPixelSeq();
+//        magicPixelSeq();
+        flash(5);
+      }
+      if ( checkSequence(seq, 4) ) {
+        flash(6);
+      }
+      if ( checkSequence(seq, 5) ) {
+        flash(8);
       }
     }
     
@@ -112,10 +119,10 @@ float max3(float a, float b, float c) {
   return max(max(a,b),c);
 }
 
-boolean array_compare(int *array_a, int *array_b, int array_len){
+boolean checkSequence(int *array_a, int array_len){
   // Compare array elements. If different, return false
   for ( int i = 0; i<array_len; i++ ) {
-    if ( array_a[i] != array_b[i] ) {
+    if ( array_a[i] != accelState[array_len - i - 1] ) {  // As accelState is ordered newest to oldest, reverse iteration order for check 
       return false;
     }
   }
